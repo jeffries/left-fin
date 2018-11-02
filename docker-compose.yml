@@ -1,0 +1,27 @@
+version: '3'
+services:
+  web:
+    build: .
+    ports:
+    - "5000:5000"
+    volumes:
+    - ".:/usr/src/app"
+    environment:
+      FLASK_ENV: development
+    depends_on:
+      - db
+    networks:
+      - dbnet
+  db:
+    image: postgres
+    ports:
+      - "5432"
+    environment:
+      POSTGRES_USER: nemo
+      POSTGRES_PASSWORD: nemo
+    networks:
+      - dbnet
+
+networks:
+  dbnet:
+    driver: bridge
