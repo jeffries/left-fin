@@ -1,0 +1,1 @@
+WEBPACK_MANIFEST_PATH = './build/manifest.json'

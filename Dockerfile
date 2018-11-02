@@ -1,17 +1,25 @@
-FROM python:3.7-stretch
+FROM ubuntu:bionic
 
-RUN apt-get update && apt-get install -y postgresql
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y python3 python3-pip postgresql libpq-dev nodejs npm
 
-WORKDIR /usr/src/app
+RUN mkdir -p /var/nemo
+WORKDIR /var/nemo
 
 COPY requirements.txt ./
+COPY package.json ./
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip3 install -r requirements.txt
+RUN npm install
 
-COPY . ./
-
-ENV FLASK_APP=nemo
+# add app
+COPY bin ./bin
+COPY nemo ./nemo
+COPY .babelrc ./
+COPY setup.py ./
+COPY webpack.config.js ./
 
 EXPOSE 5000
+EXPOSE 5001
 
-CMD /usr/src/app/bin/entrypoint.sh
+CMD /var/nemo/bin/entrypoint.sh
