@@ -1,1 +1,3 @@
-WEBPACK_MANIFEST_PATH = './build/manifest.json'
+import os
+
+DEVELOPMENT = str(os.environ['FLASK_ENV']).upper() == 'DEVELOPMENT'

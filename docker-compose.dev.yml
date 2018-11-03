@@ -1,11 +1,17 @@
 version: '3'
 services:
-  web:
-    build: .
+  webdev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     ports:
     - "5000:5000"
+    # In development, forward port 5001 to enable webpack-dev-server auto reload
     - "5001:5001"
     volumes:
+      # Include source directories only. This gets us live source reloading,
+      # but avoids mounting the `node_modules` folder in `marlin`, and avoids
+      # putting any build files (like this one) in the environment.
     - "./nemo:/var/nemo/nemo"
     - "./marlin/src:/var/nemo/marlin/src"
     environment:
@@ -14,6 +20,7 @@ services:
       - db
     networks:
       - dbnet
+      
   db:
     image: postgres
     ports:

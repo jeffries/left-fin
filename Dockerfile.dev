@@ -15,7 +15,9 @@ WORKDIR /var/nemo
 
 # Add server code
 COPY requirements.txt ./
+COPY requirements.dev.txt ./
 RUN pip3 install -r requirements.txt
+RUN pip3 install -r requirements.dev.txt
 COPY nemo ./nemo
 COPY setup.py ./
 

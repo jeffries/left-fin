@@ -17,7 +17,7 @@ from nemo import config
 app = Flask(__name__)
 app.config.from_object(config)
 
-# Register views
-import nemo.views
-app.register_blueprint(nemo.views.index_bp)
-app.register_blueprint(nemo.views.accounts_bp)
+# Register routes
+import nemo.routes
+app.register_blueprint(nemo.routes.index_bp)
+app.register_blueprint(nemo.routes.accounts_bp)
