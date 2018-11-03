@@ -6,7 +6,8 @@ services:
     - "5000:5000"
     - "5001:5001"
     volumes:
-    - ".:/var/nemo"
+    - "./nemo:/var/nemo/nemo"
+    - "./marlin/src:/var/nemo/marlin/src"
     environment:
       FLASK_ENV: development
     depends_on:

@@ -1,8 +1,12 @@
 #!/bin/bash
+
+echo "starting webpack dev server"
+cd /var/nemo/marlin
+/var/nemo/marlin/node_modules/.bin/webpack-dev-server --port 5001 --host 0.0.0.0 2>&1 | sed -e 's/^/webpack-dev-server: /' &
+
+cd /var/nemo
+
 # Ping the dumb database until it's awake
-
-npx webpack-dev-server --port 5001 --host 127.0.0.1 2>&1 | sed -e 's/^/webpack-dev-server: /' &
-
 while ! pg_isready -q -h db -d nemo -U nemo; do
     echo "waiting for database"
     sleep 2;

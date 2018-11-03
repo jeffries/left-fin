@@ -20,3 +20,4 @@ app.config.from_object(config)
 # Register views
 import nemo.views
 app.register_blueprint(nemo.views.index_bp)
+app.register_blueprint(nemo.views.accounts_bp)
