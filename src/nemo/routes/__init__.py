@@ -14,8 +14,9 @@ if nemo.config.DEVELOPMENT:
     from flask import Response
 
     # Serve bootstrap page
-    @index_bp.route('/', methods=['GET'])
-    def bootstrap():
+    @index_bp.route('/', methods=['GET'], defaults={'path': None})
+    @index_bp.route('/<path:path>', methods=['GET'])
+    def bootstrap(path):
         return render_template('bootstrap.html')
 
     # Forward asset requests to localhost:5001
