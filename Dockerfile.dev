@@ -1,37 +1,27 @@
-FROM ubuntu:bionic
+FROM nemo_base:latest
 
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update
-RUN apt-get install -y gnupg ca-certificates
-ADD https://dl.yarnpkg.com/debian/pubkey.gpg /tmp/yarnpkg.pub.gpg
-RUN cat /tmp/yarnpkg.pub.gpg | apt-key add -
-RUN rm /tmp/yarnpkg.pub.gpg
-RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-RUN apt-get update
-RUN apt-get install -y python3 python3-pip postgresql libpq-dev yarn
+ENV FLASK_ENV=development
 
-RUN mkdir -p /var/nemo/marlin
 WORKDIR /var/nemo
 
-# Add server code
-COPY requirements.txt ./
+# Add development dependencies
 COPY requirements.dev.txt ./
-RUN pip3 install -r requirements.txt
 RUN pip3 install -r requirements.dev.txt
-COPY nemo ./nemo
-COPY setup.py ./
 
-# Add client code
-COPY marlin ./marlin
-WORKDIR /var/nemo/marlin
-RUN rm -rf node_modules
-RUN yarn
+# Add config files
+COPY webpack.config.dev.js ./webpack.config.js
+COPY .babelrc ./.babelrc
 
-# Copy runtime executables 
+# Install application module
+RUN python3 setup.py develop
+
+# Copy bootstrap script
 WORKDIR /var/nemo
-COPY bin ./bin
+COPY bin/bootstrap.dev.sh ./bin/bootstrap.dev.sh
 
+# Application is served on port 5000
 EXPOSE 5000
+# webpack-dev-server uses port 5001 for live reload
 EXPOSE 5001
 
-CMD /var/nemo/bin/entrypoint.sh
+CMD /var/nemo/bin/bootstrap.dev.sh

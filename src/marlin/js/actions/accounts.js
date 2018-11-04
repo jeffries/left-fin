@@ -11,6 +11,4 @@ export const types = {
     ], 'ACCOUNTS')),
 };
 
-console.log(types);
-
 export const loadAccounts = payload => ({ type: types.ACCOUNTS_LOAD, payload: payload });

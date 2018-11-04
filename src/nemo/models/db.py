@@ -5,9 +5,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
+import nemo.config
+
 logger = logging.getLogger(__name__)
 
-engine = create_engine('postgres://nemo:nemo@db/nemo', echo=True)
+engine = create_engine(nemo.config.DB_STRING, echo=True)
 
 Session = sessionmaker()
 Session.configure(bind=engine)

@@ -1,7 +1,11 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
-# This lets us use `flask run`
 setup(
     name='nemo',
-    packages=['nemo']
+    packages=find_packages('src'),
+    package_dir={'': 'src'},
+    include_package_data=True,
+    install_requires=[
+        'flask',
+    ],
 )

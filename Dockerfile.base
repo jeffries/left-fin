@@ -1,0 +1,35 @@
+FROM ubuntu:bionic
+
+# Tell the OS there's not a human here0
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install dependencies for adding apt key
+RUN apt-get update
+RUN apt-get install -y gnupg ca-certificates
+
+# Add yarn apt key and repo
+ADD https://dl.yarnpkg.com/debian/pubkey.gpg /tmp/yarnpkg.pub.gpg
+RUN cat /tmp/yarnpkg.pub.gpg | apt-key add -
+RUN rm /tmp/yarnpkg.pub.gpg
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+
+# Install dependencies and package managers
+RUN apt-get update
+RUN apt-get install -y python3 python3-pip postgresql libpq-dev yarn
+
+# Create app directory
+RUN mkdir -p /var/nemo/marlin
+WORKDIR /var/nemo
+
+# Add server dependencies
+COPY requirements.txt ./
+RUN pip3 install -r requirements.txt
+
+# Add client dependencies
+COPY yarn.lock ./yarn.lock
+COPY package.json ./package.json
+RUN yarn
+
+# Add source
+COPY src ./src
+COPY setup.py ./

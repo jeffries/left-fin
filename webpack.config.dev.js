@@ -2,14 +2,11 @@ const path = require('path');
 
 module.exports = {
     entry: {
-        main: path.join(__dirname, 'src', 'js', 'index.js'),
-        style: path.join(__dirname, 'src', 'css', 'index.scss'),
+        main: path.join(__dirname, 'src', 'marlin', 'js', 'index.js'),
+        style: path.join(__dirname, 'src', 'marlin', 'css', 'index.scss'),
     },
     output: {
-        path: path.join(__dirname, 'build', 'public'),
         publicPath: 'http://localhost:5001/assets/',
-        // filename: '[name].[chunkhash].js',
-        // chunkFilename: '[id].[chunkhash].js',
     },
     mode: 'development',
     module: {
@@ -51,9 +48,9 @@ module.exports = {
             'Index.jsx',
         ],
         alias: {
-            Util: path.join(__dirname, 'src', 'js', 'util.js'),
-            Actions: path.join(__dirname, 'src', 'js', 'actions'),
-            Components: path.join(__dirname, 'src', 'js', 'components'),
+            Util: path.join(__dirname, 'src', 'marlin', 'js', 'util.js'),
+            Actions: path.join(__dirname, 'src', 'marlin', 'js', 'actions'),
+            Components: path.join(__dirname, 'src', 'marlin', 'js', 'components'),
         }
     },
 }

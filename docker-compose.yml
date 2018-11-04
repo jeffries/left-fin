@@ -12,15 +12,30 @@ services:
       # Include source directories only. This gets us live source reloading,
       # but avoids mounting the `node_modules` folder in `marlin`, and avoids
       # putting any build files (like this one) in the environment.
-    - "./nemo:/var/nemo/nemo"
-    - "./marlin/src:/var/nemo/marlin/src"
+    - "./src:/var/nemo/src"
     environment:
       FLASK_ENV: development
+      DB_STRING: "postgresql://nemo:nemo@db/nemo"
     depends_on:
       - db
     networks:
       - dbnet
-      
+
+  test:
+    build:
+      context: .
+      dockerfile: tests/Dockerfile
+    volumes:
+    - "./nemo:/var/nemo/nemo"
+    - "./marlin/src:/var/nemo/marlin/src"
+    environment:
+      FLASK_ENV: testing
+      DB_STRING: "postgresql://nemo:nemo@db/nemo"
+    depends_on:
+      - db
+    networks:
+      - dbnet
+
   db:
     image: postgres
     ports:
