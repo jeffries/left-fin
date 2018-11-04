@@ -6,10 +6,6 @@ WORKDIR /var/nemo
 ADD tests/requirements.txt ./requirements.test.txt
 RUN pip3 install -r requirements.test.txt
 
-# Copy babel config so test runner can load our JavaScript
-ADD .babelrc ./
-ADD webpack.config.dev.js ./webpack.config.js
-
 # Copy tests
 ADD tests ./tests
 

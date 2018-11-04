@@ -1,14 +1,13 @@
 const path = require('path');
 
-module.exports = {
+const config = {
     entry: {
         main: path.join(__dirname, 'src', 'marlin', 'js', 'index.js'),
         style: path.join(__dirname, 'src', 'marlin', 'css', 'index.scss'),
     },
     output: {
-        publicPath: 'http://localhost:5001/assets/',
+        publicPath: '/assets/',
     },
-    mode: 'development',
     module: {
         rules: [
             {
@@ -53,4 +52,13 @@ module.exports = {
             Components: path.join(__dirname, 'src', 'marlin', 'js', 'components'),
         }
     },
+};
+
+if (process.env.FLASK_ENV === 'development') {
+    config.mode = 'development';
 }
+else {
+    config.mode = 'production';
+}
+
+module.exports = config;

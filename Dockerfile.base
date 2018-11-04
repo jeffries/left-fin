@@ -30,6 +30,10 @@ COPY yarn.lock ./yarn.lock
 COPY package.json ./package.json
 RUN yarn
 
+# Add config
+ADD .babelrc ./
+ADD webpack.config.js ./
+
 # Add source
 COPY src ./src
 COPY setup.py ./

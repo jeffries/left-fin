@@ -8,10 +8,6 @@ WORKDIR /var/nemo
 COPY requirements.dev.txt ./
 RUN pip3 install -r requirements.dev.txt
 
-# Add config files
-COPY webpack.config.dev.js ./webpack.config.js
-COPY .babelrc ./.babelrc
-
 # Install application module
 RUN python3 setup.py develop
 

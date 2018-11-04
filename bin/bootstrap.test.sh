@@ -7,7 +7,7 @@ while ! pg_isready -q -h db -d nemo -U nemo; do
     echo "bootstrap: waiting for database"
     sleep 2;
 done
-echo "bootstrap: atabase is ready"
+echo "bootstrap: database is ready"
 
 # make click happier about encoding
 export LC_ALL=C.UTF-8
