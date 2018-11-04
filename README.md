@@ -16,6 +16,8 @@ This project is built as one big Docker image, including the backend and fronten
 make dev # Run development server
 ```
 
+The server will run on `http://localhost:5000`.
+
 ## Building
 
 ```
