@@ -26,8 +26,8 @@ services:
       context: .
       dockerfile: tests/Dockerfile
     volumes:
-    - "./nemo:/var/nemo/nemo"
-    - "./marlin/src:/var/nemo/marlin/src"
+    - "./src:/var/nemo/src"
+    - "./tests:/var/nemo/tests"
     environment:
       FLASK_ENV: testing
       DB_STRING: "postgresql://nemo:nemo@db/nemo"

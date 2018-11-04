@@ -13,14 +13,17 @@ echo "bootstrap: database is ready"
 export LC_ALL=C.UTF-8
 export LANG=C.UTF-8
 
-# Run backend tests
 cd /var/nemo
-pytest /var/nemo/tests
 
-# Couple lines on the terminal to seperate backend from frontend
-echo
-echo
-echo
-
-# Run frontend tests
-./node_modules/.bin/jest --config tests/jest.config.js
+if [ "$NEMO_TEST" = "nemo" ]; then
+    # Run backend tests only
+    pytest /var/nemo/tests
+elif [ "$NEMO_TEST" = "marlin" ]; then
+    # Run frontend tests only
+    ./node_modules/.bin/jest --config tests/jest.config.js
+else
+    # Run all tests
+    pytest /var/nemo/tests
+    echo; echo; echo;
+    ./node_modules/.bin/jest --config tests/jest.config.js
+fi

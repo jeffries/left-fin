@@ -2,8 +2,7 @@ const path = require('path');
 
 const config = {
     entry: {
-        main: path.join(__dirname, 'src', 'marlin', 'js', 'index.js'),
-        style: path.join(__dirname, 'src', 'marlin', 'css', 'index.scss'),
+        main: path.join(__dirname, 'src', 'marlin', 'index.js'),
     },
     output: {
         publicPath: '/assets/',
@@ -19,7 +18,7 @@ const config = {
             {
                 test: /\.(scss)$/,
                 use: [
-                    { loader: 'style-loader'},
+                    { loader: 'style-loader' },
                     { loader: 'css-loader' },
                     {
                         loader: 'postcss-loader',
@@ -34,23 +33,23 @@ const config = {
                     },
                     { loader: 'sass-loader' },
                 ],
-            }
+            },
         ],
     },
     resolve: {
         extensions: [
             '.js',
             '.jsx',
+            '.scss',
         ],
         mainFiles: [
             'index.js',
             'Index.jsx',
         ],
         alias: {
-            Util: path.join(__dirname, 'src', 'marlin', 'js', 'util.js'),
-            Actions: path.join(__dirname, 'src', 'marlin', 'js', 'actions'),
-            Components: path.join(__dirname, 'src', 'marlin', 'js', 'components'),
-        }
+            Actions: path.join(__dirname, 'src', 'marlin', 'actions'),
+            Components: path.join(__dirname, 'src', 'marlin', 'components'),
+        },
     },
 };
 

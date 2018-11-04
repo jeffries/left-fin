@@ -1,0 +1,39 @@
+{
+    "/v1/accounts": {
+        "GET": {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "$id": "http://nemo.jeffries.io/get.accounts.v1.json",
+            "properties": {
+                "accounts": {
+                    "type": "array",
+                    "description": "List of accounts",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "description": "Unique identifier for this account"
+                            },
+                            "title": {
+                                "type": "string",
+                                "description": "Title for use in displaying this account"
+                            },
+                            "number_suffix": {
+                                "type": "string",
+                                "description": "The number suffix of the account"
+                            },
+                            "currency_code": {
+                                "type": "string",
+                                "description": "The ISO 4712 code of the currency associated with this account"
+                            }
+                        },
+                        "required": [ "id", "title", "currency_code" ]
+                    },
+                    "minItems": 0,
+                    "uniqueItems": true
+                }
+            },
+            "required": [ "accounts" ]
+        }
+    }
+}

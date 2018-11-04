@@ -1,9 +1,9 @@
 # Nemo: Personal Financial Manager
 
-Nemo helps individuals manage their finances. It has some handy features, including:
+Nemo helps individuals manage their finances. It will have some handy features, including:
 - Multiple account support
 - Tracking money owed by or to you
-- Multiple currency support\
+- Multiple currency support.
 - Budgeting
 
 This project is split into two components: `nemo` and `marlin`; these are the backend and frontend, respectively, and are written in Python and JavaScript, respectively.
@@ -30,4 +30,6 @@ Tests are located in the `tests/nemo/` directory for the Python backend, and `te
 
 ```
 make test # Run unit tests
+make test-nemo # Only test backend
+make test-marlin # Onlly test frontend
 ```

@@ -2,9 +2,10 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Date, DateTime, Larg
 from sqlalchemy.orm import relationship, column_property
 
 from nemo.models.db import Base
+from nemo.models import magic_numbers
 
 class Currency(Base):
-    __tablename__ = 'currencies'
+    __tablename__ = magic_numbers.CURRENCY_TABLE
 
     iso4217_code = Column(String(3), primary_key=True)
     title = Column(String)
@@ -14,21 +15,22 @@ class Currency(Base):
     accounts = relationship('Account', back_populates='currency')
 
 class Account(Base):
-    __tablename__ = 'accounts'
+    __tablename__ = magic_numbers.ACCOUNT_TABLE
 
     id = Column(Integer, primary_key=True)
     currency_code = Column(String(3), ForeignKey('currencies.iso4217_code'))
     type = Column(String(255))
 
     currency = relationship('Currency', back_populates='accounts')
+    transactions = relationship('AccountTransaction', back_populates='account')
 
     __mapper_args__ = {
-        'polymorphic_identity': 'account',
+        'polymorphic_identity': magic_numbers.ACCOUNT_POLYID,
         'polymorphic_on': type
     }
 
-class InstitutionAccount(Base):
-    __tablename__ = 'institution_accounts'
+class InstitutionAccount(Account):
+    __tablename__ = magic_numbers.INSTITUTION_ACCOUNT_TABLE
 
     id = Column(Integer, ForeignKey('accounts.id'), primary_key=True)
     title = Column(String(255))
@@ -37,31 +39,42 @@ class InstitutionAccount(Base):
     minimum_value = Column(Integer)
 
     __mapper_args__ = {
-        'polymorphic_identity': 'institution_account'
+        'polymorphic_identity': magic_numbers.INSTITUTION_ACCOUNT_POLYID
     }
 
-class PersonalAccount(Base):
-    __tablename__ = 'personal_accounts'
+class PersonalAccount(Account):
+    __tablename__ = magic_numbers.PERSONAL_ACCOUNT_TABLE
 
     id = Column(Integer, ForeignKey('accounts.id'), primary_key=True)
     holder = Column(String(255))
 
     __mapper_args__ = {
-        'polymorphic_identity': 'personal_account'
+        'polymorphic_identity': magic_numbers.PERSONAL_ACCOUNT_POLYID
     }
 
 class TransactionCategory(Base):
-    __tablename__ = 'transaction_categories'
+    __tablename__ = magic_numbers.TRANSACTION_CATEGORY_TABLE
 
     id = Column(Integer, primary_key=True)
     title = Column(String(255))
-    parent = Column(Integer, ForeignKey('transaction_categories.id'))
+    parent_id = Column(
+        Integer,
+        ForeignKey('{}.id'.format(magic_numbers.TRANSACTION_CATEGORY_TABLE))
+    )
+
+    parent = relationship('TransactionCategory', back_populates='children', remote_side=[id])
+    children = relationship('TransactionCategory', back_populates='parent')
+
+    categorizations = relationship('TransactionCategorization', back_populates='category')
 
 class AccountTransaction(Base):
-    __tablename__ = 'account_transactions'
+    __tablename__ = magic_numbers.ACCOUNT_TRANSACTION_TABLE
 
     id = Column(Integer, primary_key=True)
-    account = Column(Integer, ForeignKey('accounts.id'))
+    account_id = Column(
+        Integer,
+        ForeignKey('{}.id'.format(magic_numbers.ACCOUNT_TABLE))
+    )
     title = Column(String(255))
     transaction_date = Column(Date)
     posting_date = Column(Date)
@@ -72,85 +85,138 @@ class AccountTransaction(Base):
     transaction_description = Column(String)
     adjustment_description = Column(String)
 
+    account = relationship('Account', back_populates='transactions')
+    categorizations = relationship('TransactionCategorization', back_populates='transaction')
+
 class TransactionAdjustment(Base):
-    __tablename__ = 'transaction_adjustments'
+    __tablename__ = magic_numbers.TRANSACTION_ADJUSTMENT_TABLE
 
     id = Column(Integer, primary_key=True)
-    source_transaction_id = Column(Integer, ForeignKey('account_transactions.id'))
-    destination_transaction_id = Column(Integer, ForeignKey('account_transactions.id'))
+    source_transaction_id = Column(
+        Integer,
+        ForeignKey('{}.id'.format(magic_numbers.ACCOUNT_TRANSACTION_TABLE))
+    )
+    destination_transaction_id = Column(
+        Integer,
+        ForeignKey('{}.id'.format(magic_numbers.ACCOUNT_TRANSACTION_TABLE))
+    )
     title = Column(String(255))
     notes = Column(String)
     type = Column(String(255))
 
+    # TODO make these back populate
+    source_transaction = relationship('AccountTransaction', foreign_keys=[source_transaction_id], back_populates='source_adjustments')
+    destination_transaction = relationship('AccountTransaction', foreign_keys=[destination_transaction_id], back_populates='destination_adjustments')
+
     __mapper_args__ = {
-        'polymorphic_identity': 'transaction_adjustment',
+        'polymorphic_identity': magic_numbers.TRANSACTION_ADJUSTMENT_POLYID,
         'polymorphic_on': type
     }
 
+class AccountTransactionAdjustment(TransactionAdjustment):
+    __tablename__ = magic_numbers.ACCOUNT_TRANSACTION_ADJUSTMENT_TABLE
 
-class AccountTransactionAdjustment(Base):
-    __tablename__ = 'account_transaction_adjustments'
-
-    id = Column(Integer, ForeignKey('transaction_adjustments.id'), primary_key=True)
+    id = Column(
+        Integer,
+        ForeignKey('{}.id'.format(magic_numbers.TRANSACTION_ADJUSTMENT_TABLE)),
+        primary_key=True
+    )
     amount = Column(Integer)
 
     __mapper_args__ = {
-        'polymorphic_identity': 'account_transaction_adjustment'
+        'polymorphic_identity': magic_numbers.ACCOUNT_TRANSACTION_ADJUSTMENT_POLYID
     }
 
-class CurrencyConversionAdjustment(Base):
-    __tablename__ = 'currency_conversion_adjustment'
+class CurrencyConversionAdjustment(TransactionAdjustment):
+    __tablename__ = magic_numbers.CURRENCY_CONVERSION_ADJUSTMENT_TABLE
 
-    id = Column(Integer, ForeignKey('transaction_adjustments.id'), primary_key=True)
+    id = Column(
+        Integer,
+        ForeignKey('{}.id'.format(magic_numbers.TRANSACTION_ADJUSTMENT_TABLE)),
+        primary_key=True
+    )
     source_amount = Column(Integer)
     destination_amount = Column(Integer)
 
     __mapper_args__ = {
-        'polymorphic_identity': 'currency_conversion_adjustment'
+        'polymorphic_identity': magic_numbers.CURRENCY_CONVERSION_ADJUSTMENT_POLYID
     }
 
-
 class TransactionCategorization(Base):
-    __tablename__ = 'transaction_categorizations'
+    __tablename__ = magic_numbers.TRANSACTION_CATEGORIZATION_TABLE
 
-    transaction_id = Column(Integer, ForeignKey('account_transactions.id'), primary_key=True)
-    category_id = Column(Integer, ForeignKey('transaction_categories.id'), primary_key=True)
+    transaction_id = Column(
+        Integer,
+        ForeignKey('{}.id'.format(magic_numbers.ACCOUNT_TRANSACTION_TABLE)),
+        primary_key=True
+    )
+    category_id = Column(
+        Integer,
+        ForeignKey('{}.id'.format(magic_numbers.TRANSACTION_CATEGORY_TABLE)),
+        primary_key=True
+    )
     amount = Column(Integer)
     notes = Column(String)
 
+    transaction = relationship('AccountTransaction', back_populates='categorizations')
+    category = relationship('TransactionCategory', back_populates='categorizations')
+
 class Receipt(Base):
-    __tablename__ = 'receipts'
+    __tablename__ = magic_numbers.RECEIPT_TABLE
 
     id = Column(Integer, primary_key=True)
-    transaction_id = Column(Integer, ForeignKey('account_transactions.id'))
+    transaction_id = Column(
+        Integer,
+        ForeignKey('{}.id'.format(magic_numbers.ACCOUNT_TRANSACTION_TABLE))
+    )
     image_jpeg = Column(LargeBinary)
     image_pdf = Column(LargeBinary)
     notes = Column(String)
 
+    transaction = relationship('AccountTransaction', back_populates='receipts')
+
 class BudgetCategory(Base):
-    __tablename__ = 'budget_categories'
+    __tablename__ = magic_numbers.BUDGET_CATEGORY_TABLE
 
     id = Column(Integer, primary_key=True)
     title = Column(String(255))
-    parent = Column(Integer, ForeignKey('budget_categories.id'))
+    parent = Column(
+        Integer,
+        ForeignKey('{}.id'.format(magic_numbers.BUDGET_CATEGORY_TABLE))
+    )
 
 class Budget(Base):
-    __tablename__ = 'budgets'
+    __tablename__ = magic_numbers.BUDGET_TABLE
 
     id = Column(Integer, primary_key=True)
     title = Column(String(255))
     start_date = Column(DateTime)
     end_date = Column(DateTime)
-    currency = Column(String(3), ForeignKey('currencies.iso4217_code'))
+    currency_id = Column(
+        String(3),
+        ForeignKey('{}.iso4217_code'.format(magic_numbers.CURRENCY_TABLE))
+    )
+
+    currency = relationship('Currency')
+    items = relationship('BudgetItem', back_populates='budget')
 
 class BudgetItem(Base):
-    __tablename__ = 'budget_items'
+    __tablename__ = magic_numbers.BUDGET_ITEM_TABLE
 
     id = Column(Integer, primary_key=True)
-    budget_id = Column(Integer, ForeignKey('budgets.id'))
-    category_id = Column(Integer, ForeignKey('budget_categories.id'))
+    budget_id = Column(
+        Integer,
+        ForeignKey('{}.id'.format(magic_numbers.BUDGET_TABLE))
+    )
+    category_id = Column(
+        Integer,
+        ForeignKey('{}.id'.format(magic_numbers.BUDGET_CATEGORY_TABLE))
+    )
     title = Column(String(255))
     notes = Column(String)
     start_date = Column(DateTime)
     end_date = Column(DateTime)
     amount = Column(Integer)
+
+    budget = relationship('Budget', back_populates='items')
+    category = relationship('BudgetCategory')

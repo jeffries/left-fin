@@ -4,10 +4,8 @@ accounts_bp = Blueprint('accounts', __name__)
 
 @accounts_bp.route('/v1/accounts', methods=['GET'])
 def list_accounts():
+    accounts = []
+
     return jsonify({
-        'accounts': [
-            {
-                'id': 2
-            }
-        ]
+        'accounts': accounts
     })

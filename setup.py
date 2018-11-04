@@ -8,4 +8,5 @@ setup(
     install_requires=[
         'flask',
     ],
+    version='0.0.1',
 )

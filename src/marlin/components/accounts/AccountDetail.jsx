@@ -10,6 +10,7 @@ export default class AccountDetail extends Component {
                         This would probably be the account name in the real application
                     </small>
                 </h2>
+                <h4>The account ID is {this.props.match.params.id}</h4>
             </div>
         );
     }

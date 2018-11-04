@@ -8,7 +8,13 @@ import nemo.config
 
 index_bp = Blueprint('index', __name__)
 
+@index_bp.route('/v1/hello', methods=['GET'])
+def hello_world():
+    return "Hello World!"
+
 # If we are in development mode, make the Python backend behave like a web server
+# We want this in development only to make the application work. In production, the
+# content served in this section would be precompiled and served by a web server.
 if nemo.config.DEVELOPMENT:
     from requests import get
     from flask import Response
