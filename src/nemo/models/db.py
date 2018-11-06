@@ -7,27 +7,27 @@ from sqlalchemy.ext.declarative import declarative_base
 
 import nemo.config
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
-Base = declarative_base()
+BASE = declarative_base()
 
-engine = create_engine(nemo.config.DB_STRING, echo=True)
-Session = scoped_session(sessionmaker(bind=engine))
+ENGINE = create_engine(nemo.config.DB_STRING, echo=True)
+SESSION = scoped_session(sessionmaker(bind=ENGINE))
 
 def init():
-    logger.info('standing tables')
-    Base.metadata.create_all(engine)
+    LOGGER.info('standing tables')
+    BASE.metadata.create_all(ENGINE)
 
 # Provides a transactional scope
 @contextmanager
 def session_scope():
-    s = Session()
-    
+    session = SESSION()
+
     try:
-        yield s
-        s.commit()
+        yield session
+        session.commit()
     except:
-        s.rollback()
+        session.rollback()
         raise
     finally:
-        s.close()
+        session.close()

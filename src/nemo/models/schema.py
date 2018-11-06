@@ -1,10 +1,10 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Date, DateTime, LargeBinary
 from sqlalchemy.orm import relationship, column_property
 
-from nemo.models.db import Base
+from nemo.models.db import BASE
 from nemo.models import magic_numbers
 
-class Currency(Base):
+class Currency(BASE):
     __tablename__ = magic_numbers.CURRENCY_TABLE
 
     iso4217_code = Column(String(3), primary_key=True)
@@ -15,7 +15,7 @@ class Currency(Base):
 
     accounts = relationship('Account', back_populates='currency')
 
-class Account(Base):
+class Account(BASE):
     __tablename__ = magic_numbers.ACCOUNT_TABLE
 
     id = Column(Integer, primary_key=True)
@@ -53,7 +53,7 @@ class PersonalAccount(Account):
         'polymorphic_identity': magic_numbers.PERSONAL_ACCOUNT_POLYID
     }
 
-class TransactionCategory(Base):
+class TransactionCategory(BASE):
     __tablename__ = magic_numbers.TRANSACTION_CATEGORY_TABLE
 
     id = Column(Integer, primary_key=True)
@@ -68,7 +68,7 @@ class TransactionCategory(Base):
 
     categorizations = relationship('TransactionCategorization', back_populates='category')
 
-class AccountTransaction(Base):
+class AccountTransaction(BASE):
     __tablename__ = magic_numbers.ACCOUNT_TRANSACTION_TABLE
 
     id = Column(Integer, primary_key=True)
@@ -90,7 +90,7 @@ class AccountTransaction(Base):
     categorizations = relationship('TransactionCategorization', back_populates='transaction')
     receipts = relationship('Receipt', back_populates='transaction')
 
-class TransactionAdjustment(Base):
+class TransactionAdjustment(BASE):
     __tablename__ = magic_numbers.TRANSACTION_ADJUSTMENT_TABLE
 
     id = Column(Integer, primary_key=True)
@@ -106,9 +106,16 @@ class TransactionAdjustment(Base):
     notes = Column(String)
     type = Column(String(255))
 
-    # TODO make these back populate
-    source_transaction = relationship('AccountTransaction', foreign_keys=[source_transaction_id], backref='source_adjustments')
-    destination_transaction = relationship('AccountTransaction', foreign_keys=[destination_transaction_id], backref='destination_adjustments')
+    source_transaction = relationship(
+        'AccountTransaction',
+        foreign_keys=[source_transaction_id],
+        backref='source_adjustments'
+    )
+    destination_transaction = relationship(
+        'AccountTransaction',
+        foreign_keys=[destination_transaction_id],
+        backref='destination_adjustments'
+    )
 
     __mapper_args__ = {
         'polymorphic_identity': magic_numbers.TRANSACTION_ADJUSTMENT_POLYID,
@@ -144,7 +151,7 @@ class CurrencyConversionAdjustment(TransactionAdjustment):
         'polymorphic_identity': magic_numbers.CURRENCY_CONVERSION_ADJUSTMENT_POLYID
     }
 
-class TransactionCategorization(Base):
+class TransactionCategorization(BASE):
     __tablename__ = magic_numbers.TRANSACTION_CATEGORIZATION_TABLE
 
     transaction_id = Column(
@@ -163,7 +170,7 @@ class TransactionCategorization(Base):
     transaction = relationship('AccountTransaction', back_populates='categorizations')
     category = relationship('TransactionCategory', back_populates='categorizations')
 
-class Receipt(Base):
+class Receipt(BASE):
     __tablename__ = magic_numbers.RECEIPT_TABLE
 
     id = Column(Integer, primary_key=True)
@@ -177,7 +184,7 @@ class Receipt(Base):
 
     transaction = relationship('AccountTransaction', back_populates='receipts')
 
-class BudgetCategory(Base):
+class BudgetCategory(BASE):
     __tablename__ = magic_numbers.BUDGET_CATEGORY_TABLE
 
     id = Column(Integer, primary_key=True)
@@ -187,7 +194,7 @@ class BudgetCategory(Base):
         ForeignKey('{}.id'.format(magic_numbers.BUDGET_CATEGORY_TABLE))
     )
 
-class Budget(Base):
+class Budget(BASE):
     __tablename__ = magic_numbers.BUDGET_TABLE
 
     id = Column(Integer, primary_key=True)
@@ -202,7 +209,7 @@ class Budget(Base):
     currency = relationship('Currency')
     items = relationship('BudgetItem', back_populates='budget')
 
-class BudgetItem(Base):
+class BudgetItem(BASE):
     __tablename__ = magic_numbers.BUDGET_ITEM_TABLE
 
     id = Column(Integer, primary_key=True)

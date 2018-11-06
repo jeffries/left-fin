@@ -1,29 +1,31 @@
 import json
 
-from flask import Blueprint, render_template, jsonify, request, Response, abort
+from flask import Blueprint, jsonify, request, Response, abort
 from sqlalchemy.orm.exc import NoResultFound
 
 from nemo.models.db import session_scope
 from nemo.models.schema import Account, InstitutionAccount, PersonalAccount, Currency
 
-accounts_bp = Blueprint('accounts', __name__)
+ACCOUNTS_BP = Blueprint('accounts', __name__)
 
-@accounts_bp.route('/v1/accounts', methods=['GET'])
+@ACCOUNTS_BP.route('/v1/accounts', methods=['GET'])
 def list_accounts():
-    with session_scope() as s:
-        ia = map(map_ia, s.query(InstitutionAccount).all())
-        pa = map(map_pa, s.query(PersonalAccount).all())
+    """Retreive a listing of accounts"""
+    with session_scope() as session:
+        inst_acc = map(map_ia, session.query(InstitutionAccount).all())
+        personal_acc = map(map_pa, session.query(PersonalAccount).all())
 
     return jsonify({
-        'accounts': list(list(ia) + list(pa))
+        'accounts': list(list(inst_acc) + list(personal_acc))
     })
 
-@accounts_bp.route('/v1/accounts', methods=['POST'])
+@ACCOUNTS_BP.route('/v1/accounts', methods=['POST'])
 def create_account():
+    """Create a new account"""
     account_json = request.get_json()
 
     account_type = account_json['type']
-    
+
     if account_type == 'institution_account':
         title = str(account_json['title'])
         institution_title = str(account_json['institution_title'])
@@ -31,10 +33,7 @@ def create_account():
         minimum_value = int(account_json['minimum_value'])
 
         # account and institution title must be present
-        if title is None or \
-                len(title) <= 0 or \
-                institution_title is None or \
-                len(institution_title) <= 0:
+        if not title or not institution_title:
             raise ValueError('account and institution titles are required')
 
         account = InstitutionAccount(
@@ -57,65 +56,69 @@ def create_account():
 
     currency_code = account_json['currency']
 
-    with session_scope() as s:
-        currency = s.query(Currency).filter(Currency.iso4217_code == currency_code).one()
-        s.add(account)
+    with session_scope() as session:
+        currency = session.query(Currency).filter(Currency.iso4217_code == currency_code).one()
+        session.add(account)
         account.currency = currency
-        s.commit()
+        session.commit()
 
-        a_path = '/v1/accounts/{}'.format(account.id)
-        a = map_account(account)
+        account_path = '/v1/accounts/{}'.format(account.id)
+        account_json = map_account(account)
 
-    r = Response()
-    r.headers['Location'] = a_path
-    r.status_code = 201
-    r.data = json.dumps(a)
-    r.headers['Content-Type'] = 'application/json'
+    resp = Response()
+    resp.headers['Location'] = account_path
+    resp.status_code = 201
+    resp.data = json.dumps(account_json)
+    resp.headers['Content-Type'] = 'application/json'
 
-    return r
+    return resp
 
-@accounts_bp.route('/v1/accounts/<int:account_id>', methods=['GET'])
+@ACCOUNTS_BP.route('/v1/accounts/<int:account_id>', methods=['GET'])
 def retreive_account(account_id):
-    with session_scope() as s:
+    """Retrieve a particular account"""
+    with session_scope() as session:
         try:
-            account = s.query(Account).filter(Account.id == account_id).one()
+            account = session.query(Account).filter(Account.id == account_id).one()
         except NoResultFound:
             abort(404)
 
         if account.type == 'institution_account':
-            account = s.query(InstitutionAccount).filter(Account.id == account_id).one()
+            account = session.query(InstitutionAccount).filter(Account.id == account_id).one()
 
             account_json = map_ia(account)
         elif account.type == 'personal_account':
-            account = s.query(PersonalAccount).filter(Account.id == account_id).one()
+            account = session.query(PersonalAccount).filter(Account.id == account_id).one()
 
             account_json = map_pa(account)
 
     return jsonify(account_json)
 
-def map_ia(a):
+def map_ia(acc):
+    """Map an institutional account from sqlalchemy object to JSON representation"""
     return {
-        'id': a.id,
-        'type': a.type,
-        'currency': a.currency.iso4217_code,
-        'minimum_value': a.minimum_value,
-        'number_suffix': a.number_suffix,
-        'title': a.title,
-        'institution_title': a.institution_title
+        'id': acc.id,
+        'type': acc.type,
+        'currency': acc.currency.iso4217_code,
+        'minimum_value': acc.minimum_value,
+        'number_suffix': acc.number_suffix,
+        'title': acc.title,
+        'institution_title': acc.institution_title
     }
 
-def map_pa(a):
+def map_pa(acc):
+    """Map a personal account from sqlalchemy object to JSON representation"""
     return {
-        'id': a.id,
-        'type': a.type,
-        'currency': a.currency.iso4217_code,
-        'holder': a.holder
+        'id': acc.id,
+        'type': acc.type,
+        'currency': acc.currency.iso4217_code,
+        'holder': acc.holder
     }
 
-def map_account(a):
-    if a.type == 'institution_account':
-        return map_ia(a)
-    elif a.type == 'personal_account':
-        return map_pa(a)
+def map_account(acc):
+    """Map an account from sqlalchemy object to JSON representation"""
+    if acc.type == 'institution_account':
+        return map_ia(acc)
+    elif acc.type == 'personal_account':
+        return map_pa(acc)
     else:
         raise ValueError('bad account type')

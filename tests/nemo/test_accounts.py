@@ -74,3 +74,7 @@ def test_create_personal_account(client):
         assert d1[k] == v
         assert k in d2
         assert d2[k] == v
+
+
+def test_create_invalid_institution_account(client):
+    pass

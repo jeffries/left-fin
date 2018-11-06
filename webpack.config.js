@@ -3,9 +3,13 @@ const path = require('path');
 const config = {
     entry: {
         main: path.join(__dirname, 'src', 'marlin', 'index.js'),
+        style: path.join(__dirname, 'src', 'marlin', 'style.js'),
     },
     output: {
         publicPath: '/assets/',
+        filename: '[name].bundle.js',
+        chunkFilename: '[name].bundle.js',
+        path: path.join(__dirname, 'target', 'assets'),
     },
     module: {
         rules: [
@@ -49,6 +53,11 @@ const config = {
         alias: {
             Actions: path.join(__dirname, 'src', 'marlin', 'actions'),
             Components: path.join(__dirname, 'src', 'marlin', 'components'),
+        },
+    },
+    optimization: {
+        splitChunks: {
+            chunks: 'all'
         },
     },
 };

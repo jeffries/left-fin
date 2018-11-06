@@ -1,5 +1,4 @@
 import 'bootstrap'; 
-import 'bootstrap/scss/bootstrap'; // bootstrap default styles
 
 import React from 'react';
 import ReactDOM from 'react-dom';

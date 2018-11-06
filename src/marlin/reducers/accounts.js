@@ -6,9 +6,9 @@ const initialState = {
 
 export default (state = initialState, { type, payload }) => {
     switch (type) {
-        case types.ACCOUNTS_LOAD:
-            return { ...state, accounts: payload };
-        default:
-            return state;
+    case types.ACCOUNTS_LOAD:
+        return { ...state, accounts: payload };
+    default:
+        return state;
     }
 };

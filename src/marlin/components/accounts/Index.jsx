@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import { Route } from 'react-router-dom';
 
-import AccountHome from './AccountHome'
+import AccountHome from './AccountHome';
 import AccountDetail from './AccountDetail';
 
 export default class Accounts extends Component {
@@ -10,7 +10,7 @@ export default class Accounts extends Component {
         return (
             <div>
                 <Route path={this.props.match.url} exact component={AccountHome} />
-                <Route path={`${this.props.match.url}/:id`} exact component={AccountDetail} />
+                <Route path={`${this.props.match.url}/:id`} component={AccountDetail} />
             </div>
         );
     }

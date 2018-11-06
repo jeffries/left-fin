@@ -39,6 +39,17 @@ test-marlin:
 	docker-compose -f docker-compose.yml run -e NEMO_TEST=marlin test
 
 # =====================
+# Lint
+# =====================
+.PHONY: lint-nemo
+lint-nemo: dev-image
+	docker-compose -f docker-compose.yml run webdev pylint nemo
+
+.PHONY: lint-marlin
+lint-marlin: dev-image
+	docker-compose -f docker-compose.yml run webdev yarn run eslint "src/marlin/**"
+
+# =====================
 # Image builds
 # =====================
 

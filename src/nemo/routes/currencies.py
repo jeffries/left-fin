@@ -6,14 +6,15 @@ from flask import Blueprint, request, Response, jsonify, abort
 from nemo.models.db import session_scope
 from nemo.models.schema import Currency
 
-currencies_bp = Blueprint('currencies', __name__)
+CURRENCIES_BP = Blueprint('currencies', __name__)
 
-currency_re = re.compile('^[A-Z]{3}$')
+ISO4217_CODE_REGEX = re.compile('^[A-Z]{3}$')
 
-@currencies_bp.route('/v1/currencies', methods=['GET'])
+@CURRENCIES_BP.route('/v1/currencies', methods=['GET'])
 def list_currencies():
-    with session_scope() as s:
-        currencies = s.query(Currency)
+    """List currencies."""
+    with session_scope() as session:
+        currencies = session.query(Currency)
 
     currencies = map(map_currency, currencies)
 
@@ -21,8 +22,9 @@ def list_currencies():
         'currencies': list(currencies)
     })
 
-@currencies_bp.route('/v1/currencies', methods=['POST'])
+@CURRENCIES_BP.route('/v1/currencies', methods=['POST'])
 def create_currency():
+    """Create new currency"""
     currency_json = request.get_json()
 
     try:
@@ -33,9 +35,9 @@ def create_currency():
         display_factor = currency_json['display_factor'] if 'display_factor' in currency_json else 0
 
         assert iso4217_code is not None
-        assert currency_re.match(iso4217_code)
+        assert ISO4217_CODE_REGEX.match(iso4217_code)
         assert title is not None
-        assert len(title) > 0
+        assert title
         assert symbol is not None
         assert len(symbol) == 1
         assert long_symbol is not None
@@ -53,34 +55,38 @@ def create_currency():
         display_factor=display_factor
     )
 
-    with session_scope() as s:
-        s.add(currency)
-        c_path = '/v1/currencies/{}'.format(currency.iso4217_code)
-        c = map_currency(currency)
+    with session_scope() as session:
+        session.add(currency)
+        currency_path = '/v1/currencies/{}'.format(currency.iso4217_code)
+        currency_json = map_currency(currency)
 
-    r = Response()
-    r.headers['Location'] = c_path
-    r.status_code = 201
-    r.data = json.dumps(c)
-    r.headers['Content-Type'] = 'application/json'
+    resp = Response()
+    resp.headers['Location'] = currency_path
+    resp.status_code = 201
+    resp.data = json.dumps(currency_json)
+    resp.headers['Content-Type'] = 'application/json'
 
-    return r
+    return resp
 
-@currencies_bp.route('/v1/currencies/<string:currency_code>', methods=['GET'])
+@CURRENCIES_BP.route('/v1/currencies/<string:currency_code>', methods=['GET'])
 def retreive_currency(currency_code):
-    if not currency_re.match(currency_code):
+    if not ISO4217_CODE_REGEX.match(currency_code):
         abort(404)
 
-    with session_scope() as s:
-        c = map_currency(s.query(Currency).filter(Currency.iso4217_code == currency_code).one())
+    with session_scope() as session:
+        currency_json = map_currency(
+            session.query(Currency) \
+                .filter(Currency.iso4217_code == currency_code) \
+                .one()
+        )
 
-    return jsonify(c)
+    return jsonify(currency_json)
 
-def map_currency(c):
+def map_currency(currency):
     return {
-        'iso4217_code': c.iso4217_code,
-        'title': c.title,
-        'symbol': c.symbol,
-        'long_symbol': c.long_symbol,
-        'display_factor': c.display_factor,
+        'iso4217_code': currency.iso4217_code,
+        'title': currency.title,
+        'symbol': currency.symbol,
+        'long_symbol': currency.long_symbol,
+        'display_factor': currency.display_factor,
     }
