@@ -1,4 +1,4 @@
-# Magic Numbers (constants) for models
+"""Magic numbers (constants) for use by the models package."""
 
 # Table names
 CURRENCY_TABLE = 'currencies'

@@ -1,3 +1,5 @@
+"""Routes under the /v1/currencies namespace"""
+
 import json
 import re
 
@@ -13,6 +15,7 @@ ISO4217_CODE_REGEX = re.compile('^[A-Z]{3}$')
 @CURRENCIES_BP.route('/v1/currencies', methods=['GET'])
 def list_currencies():
     """List currencies."""
+
     with session_scope() as session:
         currencies = session.query(Currency)
 
@@ -25,6 +28,7 @@ def list_currencies():
 @CURRENCIES_BP.route('/v1/currencies', methods=['POST'])
 def create_currency():
     """Create new currency"""
+
     currency_json = request.get_json()
 
     try:
@@ -70,6 +74,8 @@ def create_currency():
 
 @CURRENCIES_BP.route('/v1/currencies/<string:currency_code>', methods=['GET'])
 def retreive_currency(currency_code):
+    """Retreive a particular currency"""
+
     if not ISO4217_CODE_REGEX.match(currency_code):
         abort(404)
 
@@ -83,6 +89,8 @@ def retreive_currency(currency_code):
     return jsonify(currency_json)
 
 def map_currency(currency):
+    """Map a currency from a SQLAlchemy object to JSON schema"""
+
     return {
         'iso4217_code': currency.iso4217_code,
         'title': currency.title,

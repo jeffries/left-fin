@@ -1,4 +1,6 @@
-# Configure logging
+"""Main module for nemo backend. The `app` member will be detected by Flask
+when we run `flask run`"""
+
 import logging
 
 from flask import Flask
@@ -8,6 +10,7 @@ import nemo.models.schema
 import nemo.routes
 from nemo import config
 
+# Configure logging
 logging.basicConfig(level=logging.INFO) # TODO change depending on environment
 
 # Initialize database

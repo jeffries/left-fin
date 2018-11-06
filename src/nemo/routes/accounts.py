@@ -1,3 +1,5 @@
+"""Routes under the /v1/accounts namespace"""
+
 import json
 
 from flask import Blueprint, jsonify, request, Response, abort

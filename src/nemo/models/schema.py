@@ -1,10 +1,22 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Date, DateTime, LargeBinary
-from sqlalchemy.orm import relationship, column_property
+"""Defines the schema for nemo's backend database."""
+
+from sqlalchemy import (
+    Column,
+    Date,
+    DateTime,
+    ForeignKey,
+    Integer,
+    LargeBinary,
+    String
+)
+from sqlalchemy.orm import relationship
 
 from nemo.models.db import BASE
 from nemo.models import magic_numbers
 
-class Currency(BASE):
+class Currency(BASE): # pylint: disable=too-few-public-methods
+    """SQLAlchemy class for currenencies"""
+
     __tablename__ = magic_numbers.CURRENCY_TABLE
 
     iso4217_code = Column(String(3), primary_key=True)
@@ -15,7 +27,9 @@ class Currency(BASE):
 
     accounts = relationship('Account', back_populates='currency')
 
-class Account(BASE):
+class Account(BASE): # pylint: disable=too-few-public-methods
+    """SQLAlchemy class for accounts (either personal or institutional)"""
+
     __tablename__ = magic_numbers.ACCOUNT_TABLE
 
     id = Column(Integer, primary_key=True)
@@ -30,7 +44,9 @@ class Account(BASE):
         'polymorphic_on': type
     }
 
-class InstitutionAccount(Account):
+class InstitutionAccount(Account): # pylint: disable=too-few-public-methods
+    """SQLAlchemy class for institutional (bank) accounts"""
+
     __tablename__ = magic_numbers.INSTITUTION_ACCOUNT_TABLE
 
     id = Column(Integer, ForeignKey('accounts.id'), primary_key=True)
@@ -43,7 +59,9 @@ class InstitutionAccount(Account):
         'polymorphic_identity': magic_numbers.INSTITUTION_ACCOUNT_POLYID
     }
 
-class PersonalAccount(Account):
+class PersonalAccount(Account): # pylint: disable=too-few-public-methods
+    """SQLAlchemy class for personal accounts"""
+
     __tablename__ = magic_numbers.PERSONAL_ACCOUNT_TABLE
 
     id = Column(Integer, ForeignKey('accounts.id'), primary_key=True)
@@ -53,7 +71,9 @@ class PersonalAccount(Account):
         'polymorphic_identity': magic_numbers.PERSONAL_ACCOUNT_POLYID
     }
 
-class TransactionCategory(BASE):
+class TransactionCategory(BASE): # pylint: disable=too-few-public-methods
+    """SQLAlchemy class for a category of transaction"""
+
     __tablename__ = magic_numbers.TRANSACTION_CATEGORY_TABLE
 
     id = Column(Integer, primary_key=True)
@@ -68,7 +88,9 @@ class TransactionCategory(BASE):
 
     categorizations = relationship('TransactionCategorization', back_populates='category')
 
-class AccountTransaction(BASE):
+class AccountTransaction(BASE): # pylint: disable=too-few-public-methods
+    """SQLAlchemy class for transactions on accounts"""
+
     __tablename__ = magic_numbers.ACCOUNT_TRANSACTION_TABLE
 
     id = Column(Integer, primary_key=True)
@@ -90,7 +112,9 @@ class AccountTransaction(BASE):
     categorizations = relationship('TransactionCategorization', back_populates='transaction')
     receipts = relationship('Receipt', back_populates='transaction')
 
-class TransactionAdjustment(BASE):
+class TransactionAdjustment(BASE): # pylint: disable=too-few-public-methods
+    """SQLAlchemy class for an adjustment, linking two transactions"""
+
     __tablename__ = magic_numbers.TRANSACTION_ADJUSTMENT_TABLE
 
     id = Column(Integer, primary_key=True)
@@ -122,7 +146,9 @@ class TransactionAdjustment(BASE):
         'polymorphic_on': type
     }
 
-class AccountTransactionAdjustment(TransactionAdjustment):
+class AccountTransactionAdjustment(TransactionAdjustment): # pylint: disable=too-few-public-methods
+    """SQLAlchemy class for adjustments linking two transactions in the same currency"""
+
     __tablename__ = magic_numbers.ACCOUNT_TRANSACTION_ADJUSTMENT_TABLE
 
     id = Column(
@@ -136,7 +162,9 @@ class AccountTransactionAdjustment(TransactionAdjustment):
         'polymorphic_identity': magic_numbers.ACCOUNT_TRANSACTION_ADJUSTMENT_POLYID
     }
 
-class CurrencyConversionAdjustment(TransactionAdjustment):
+class CurrencyConversionAdjustment(TransactionAdjustment): # pylint: disable=too-few-public-methods
+    """SQLAlchemy class for adjustments linking transactions in different currencies"""
+
     __tablename__ = magic_numbers.CURRENCY_CONVERSION_ADJUSTMENT_TABLE
 
     id = Column(
@@ -151,7 +179,9 @@ class CurrencyConversionAdjustment(TransactionAdjustment):
         'polymorphic_identity': magic_numbers.CURRENCY_CONVERSION_ADJUSTMENT_POLYID
     }
 
-class TransactionCategorization(BASE):
+class TransactionCategorization(BASE): # pylint: disable=too-few-public-methods
+    """SQLAlchemy for associating a portion of a transaction with a category"""
+
     __tablename__ = magic_numbers.TRANSACTION_CATEGORIZATION_TABLE
 
     transaction_id = Column(
@@ -170,7 +200,9 @@ class TransactionCategorization(BASE):
     transaction = relationship('AccountTransaction', back_populates='categorizations')
     category = relationship('TransactionCategory', back_populates='categorizations')
 
-class Receipt(BASE):
+class Receipt(BASE): # pylint: disable=too-few-public-methods
+    """SQLAlchemy class for receipts"""
+
     __tablename__ = magic_numbers.RECEIPT_TABLE
 
     id = Column(Integer, primary_key=True)
@@ -184,7 +216,9 @@ class Receipt(BASE):
 
     transaction = relationship('AccountTransaction', back_populates='receipts')
 
-class BudgetCategory(BASE):
+class BudgetCategory(BASE): # pylint: disable=too-few-public-methods
+    """SQLAlchemy class for budget categories"""
+
     __tablename__ = magic_numbers.BUDGET_CATEGORY_TABLE
 
     id = Column(Integer, primary_key=True)
@@ -194,7 +228,9 @@ class BudgetCategory(BASE):
         ForeignKey('{}.id'.format(magic_numbers.BUDGET_CATEGORY_TABLE))
     )
 
-class Budget(BASE):
+class Budget(BASE): # pylint: disable=too-few-public-methods
+    """SQLAlchemy class for budgets"""
+
     __tablename__ = magic_numbers.BUDGET_TABLE
 
     id = Column(Integer, primary_key=True)
@@ -209,7 +245,9 @@ class Budget(BASE):
     currency = relationship('Currency')
     items = relationship('BudgetItem', back_populates='budget')
 
-class BudgetItem(BASE):
+class BudgetItem(BASE): # pylint: disable=too-few-public-methods
+    """SQLAlchemy class for budget line items"""
+
     __tablename__ = magic_numbers.BUDGET_ITEM_TABLE
 
     id = Column(Integer, primary_key=True)

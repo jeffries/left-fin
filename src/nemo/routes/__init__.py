@@ -1,3 +1,5 @@
+"""Module defining all route handlers for nemo"""
+
 import logging
 
 from flask import Blueprint, render_template
