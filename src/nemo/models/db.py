@@ -2,29 +2,32 @@ from contextlib import contextmanager
 import logging
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
 
 import nemo.config
 
 logger = logging.getLogger(__name__)
 
-engine = create_engine(nemo.config.DB_STRING, echo=True)
-
-Session = sessionmaker()
-Session.configure(bind=engine)
-
 Base = declarative_base()
+
+engine = create_engine(nemo.config.DB_STRING, echo=True)
+Session = scoped_session(sessionmaker(bind=engine))
 
 def init():
     logger.info('standing tables')
     Base.metadata.create_all(engine)
 
-# Provides a convenient transaction context
-# with transaction() as t:
-#     pass
+# Provides a transactional scope
 @contextmanager
-def transaction():
+def session_scope():
     s = Session()
-    yield s
-    s.commit()
+    
+    try:
+        yield s
+        s.commit()
+    except:
+        s.rollback()
+        raise
+    finally:
+        s.close()

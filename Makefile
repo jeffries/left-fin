@@ -30,12 +30,12 @@ test: test-image
 
 # Test backend only
 .PHONY: test-nemo
-test-nemo: test-image
+test-nemo:
 	docker-compose -f docker-compose.yml run -e NEMO_TEST=nemo test
 
 # Test frontend only
 .PHONY: test-marlin
-test-marlin: test-image
+test-marlin:
 	docker-compose -f docker-compose.yml run -e NEMO_TEST=marlin test
 
 # =====================

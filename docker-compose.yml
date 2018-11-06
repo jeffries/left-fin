@@ -28,6 +28,7 @@ services:
     volumes:
     - "./src:/var/nemo/src"
     - "./tests:/var/nemo/tests"
+    - "./target:/target"
     environment:
       FLASK_ENV: testing
       DB_STRING: "postgresql://nemo:nemo@db/nemo"

@@ -11,6 +11,7 @@ class Currency(Base):
     title = Column(String)
     symbol = Column(String(1))
     long_symbol = Column(String(3))
+    display_factor = Column(Integer)
 
     accounts = relationship('Account', back_populates='currency')
 
@@ -87,6 +88,7 @@ class AccountTransaction(Base):
 
     account = relationship('Account', back_populates='transactions')
     categorizations = relationship('TransactionCategorization', back_populates='transaction')
+    receipts = relationship('Receipt', back_populates='transaction')
 
 class TransactionAdjustment(Base):
     __tablename__ = magic_numbers.TRANSACTION_ADJUSTMENT_TABLE
@@ -105,8 +107,8 @@ class TransactionAdjustment(Base):
     type = Column(String(255))
 
     # TODO make these back populate
-    source_transaction = relationship('AccountTransaction', foreign_keys=[source_transaction_id], back_populates='source_adjustments')
-    destination_transaction = relationship('AccountTransaction', foreign_keys=[destination_transaction_id], back_populates='destination_adjustments')
+    source_transaction = relationship('AccountTransaction', foreign_keys=[source_transaction_id], backref='source_adjustments')
+    destination_transaction = relationship('AccountTransaction', foreign_keys=[destination_transaction_id], backref='destination_adjustments')
 
     __mapper_args__ = {
         'polymorphic_identity': magic_numbers.TRANSACTION_ADJUSTMENT_POLYID,

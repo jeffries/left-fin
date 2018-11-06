@@ -17,13 +17,13 @@ cd /var/nemo
 
 if [ "$NEMO_TEST" = "nemo" ]; then
     # Run backend tests only
-    pytest /var/nemo/tests
+    py.test --cov=/var/nemo/src/nemo --cov-report term --cov-report xml:/target/coverage.xml /var/nemo/tests
 elif [ "$NEMO_TEST" = "marlin" ]; then
     # Run frontend tests only
     ./node_modules/.bin/jest --config tests/jest.config.js
 else
     # Run all tests
-    pytest /var/nemo/tests
+    py.test --cov=/var/nemo/src/nemo --cov-report term --cov-report xml:/target/coverage.xml /var/nemo/tests
     echo; echo; echo;
     ./node_modules/.bin/jest --config tests/jest.config.js
 fi

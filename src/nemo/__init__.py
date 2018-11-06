@@ -23,3 +23,4 @@ app.config.from_object(config)
 import nemo.routes
 app.register_blueprint(nemo.routes.index_bp)
 app.register_blueprint(nemo.routes.accounts_bp)
+app.register_blueprint(nemo.routes.currencies_bp)
