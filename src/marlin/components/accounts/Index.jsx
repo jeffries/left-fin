@@ -7,11 +7,9 @@ import AccountDetail from './AccountDetail';
 
 export default class Accounts extends Component {
     render() {
-        return (
-            <div>
-                <Route path={this.props.match.url} exact component={AccountHome} />
-                <Route path={`${this.props.match.url}/:id`} component={AccountDetail} />
-            </div>
-        );
+        return [
+            <Route key='home' path={this.props.match.url} exact component={AccountHome} />,
+            <Route key='detail' path={`${this.props.match.url}/:id`} component={AccountDetail} />
+        ];
     }
 }

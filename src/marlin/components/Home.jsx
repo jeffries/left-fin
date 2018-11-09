@@ -10,7 +10,11 @@ export default class Home extends Component {
                     <h1 className='display-3'>Welcome to Nemo.</h1>
                     <h2>Nemo is a personal financial manager.</h2>
                     <ul>
-                        <li>Currencies</li>
+                        <li>
+                            <Link to='/currencies'>
+                                Currencies
+                            </Link>
+                        </li>
                         <li>
                             <Link to='/accounts'>
                                 Accounts

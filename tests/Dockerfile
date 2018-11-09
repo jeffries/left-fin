@@ -17,6 +17,7 @@ RUN python3 setup.py develop
 # Copy bootstrap script
 WORKDIR /var/nemo
 COPY bin/bootstrap.test.sh ./bin/bootstrap.test.sh
+COPY bin/bootstrap.util.sh ./bin/bootstrap.util.sh
 
 CMD /var/nemo/bin/bootstrap.test.sh
 

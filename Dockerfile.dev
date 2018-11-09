@@ -14,6 +14,7 @@ RUN python3 setup.py develop
 # Copy bootstrap script
 WORKDIR /var/nemo
 COPY bin/bootstrap.dev.sh ./bin/bootstrap.dev.sh
+COPY bin/bootstrap.util.sh ./bin/bootstrap.util.sh
 
 # Application is served on port 5000
 EXPOSE 5000

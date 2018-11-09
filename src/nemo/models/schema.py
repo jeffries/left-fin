@@ -32,7 +32,7 @@ class Account(BASE): # pylint: disable=too-few-public-methods
 
     __tablename__ = magic_numbers.ACCOUNT_TABLE
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True) # pylint: disable=invalid-name
     currency_code = Column(String(3), ForeignKey('currencies.iso4217_code'))
     type = Column(String(255))
 
@@ -49,7 +49,7 @@ class InstitutionAccount(Account): # pylint: disable=too-few-public-methods
 
     __tablename__ = magic_numbers.INSTITUTION_ACCOUNT_TABLE
 
-    id = Column(Integer, ForeignKey('accounts.id'), primary_key=True)
+    id = Column(Integer, ForeignKey('accounts.id'), primary_key=True) # pylint: disable=invalid-name
     title = Column(String(255))
     number_suffix = Column(String(4))
     institution_title = Column(String(255))
@@ -64,7 +64,7 @@ class PersonalAccount(Account): # pylint: disable=too-few-public-methods
 
     __tablename__ = magic_numbers.PERSONAL_ACCOUNT_TABLE
 
-    id = Column(Integer, ForeignKey('accounts.id'), primary_key=True)
+    id = Column(Integer, ForeignKey('accounts.id'), primary_key=True) # pylint: disable=invalid-name
     holder = Column(String(255))
 
     __mapper_args__ = {
@@ -76,7 +76,7 @@ class TransactionCategory(BASE): # pylint: disable=too-few-public-methods
 
     __tablename__ = magic_numbers.TRANSACTION_CATEGORY_TABLE
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True) # pylint: disable=invalid-name
     title = Column(String(255))
     parent_id = Column(
         Integer,
@@ -93,7 +93,7 @@ class AccountTransaction(BASE): # pylint: disable=too-few-public-methods
 
     __tablename__ = magic_numbers.ACCOUNT_TRANSACTION_TABLE
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True) # pylint: disable=invalid-name
     account_id = Column(
         Integer,
         ForeignKey('{}.id'.format(magic_numbers.ACCOUNT_TABLE))
@@ -117,7 +117,7 @@ class TransactionAdjustment(BASE): # pylint: disable=too-few-public-methods
 
     __tablename__ = magic_numbers.TRANSACTION_ADJUSTMENT_TABLE
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True) # pylint: disable=invalid-name
     source_transaction_id = Column(
         Integer,
         ForeignKey('{}.id'.format(magic_numbers.ACCOUNT_TRANSACTION_TABLE))
@@ -151,7 +151,7 @@ class AccountTransactionAdjustment(TransactionAdjustment): # pylint: disable=too
 
     __tablename__ = magic_numbers.ACCOUNT_TRANSACTION_ADJUSTMENT_TABLE
 
-    id = Column(
+    id = Column( # pylint: disable=invalid-name
         Integer,
         ForeignKey('{}.id'.format(magic_numbers.TRANSACTION_ADJUSTMENT_TABLE)),
         primary_key=True
@@ -167,7 +167,7 @@ class CurrencyConversionAdjustment(TransactionAdjustment): # pylint: disable=too
 
     __tablename__ = magic_numbers.CURRENCY_CONVERSION_ADJUSTMENT_TABLE
 
-    id = Column(
+    id = Column( # pylint: disable=invalid-name
         Integer,
         ForeignKey('{}.id'.format(magic_numbers.TRANSACTION_ADJUSTMENT_TABLE)),
         primary_key=True
@@ -205,7 +205,7 @@ class Receipt(BASE): # pylint: disable=too-few-public-methods
 
     __tablename__ = magic_numbers.RECEIPT_TABLE
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True) # pylint: disable=invalid-name
     transaction_id = Column(
         Integer,
         ForeignKey('{}.id'.format(magic_numbers.ACCOUNT_TRANSACTION_TABLE))
@@ -221,7 +221,7 @@ class BudgetCategory(BASE): # pylint: disable=too-few-public-methods
 
     __tablename__ = magic_numbers.BUDGET_CATEGORY_TABLE
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True) # pylint: disable=invalid-name
     title = Column(String(255))
     parent = Column(
         Integer,
@@ -233,7 +233,7 @@ class Budget(BASE): # pylint: disable=too-few-public-methods
 
     __tablename__ = magic_numbers.BUDGET_TABLE
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True) # pylint: disable=invalid-name
     title = Column(String(255))
     start_date = Column(DateTime)
     end_date = Column(DateTime)
@@ -250,7 +250,7 @@ class BudgetItem(BASE): # pylint: disable=too-few-public-methods
 
     __tablename__ = magic_numbers.BUDGET_ITEM_TABLE
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True) # pylint: disable=invalid-name
     budget_id = Column(
         Integer,
         ForeignKey('{}.id'.format(magic_numbers.BUDGET_TABLE))

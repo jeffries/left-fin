@@ -17,23 +17,20 @@ INDEX_BP = Blueprint('index', __name__)
 
 @INDEX_BP.route('/v1/hello', methods=['GET'])
 def hello_world():
+    """Health check endpoint"""
     return "Hello World!"
 
 # If we are in development mode, make the Python backend behave like a web server
+# by forwarding requests to an instance of webpack-dev-server running on localhost:5001.
 # We want this in development only to make the application work. In production, the
 # content served in this section would be precompiled and served by a web server.
 if nemo.config.DEVELOPMENT:
-    LOGGER.warn('enabling asset serving pass-through for development')
+    LOGGER.warning('enabling asset serving pass-through for development')
+
+    import re
 
     from requests import get
-    from flask import Response
-
-    # Serve bootstrap page
-    @INDEX_BP.route('/', methods=['GET'], defaults={'path': None})
-    @INDEX_BP.route('/<path:path>', methods=['GET'])
-    def bootstrap():
-        """Return a page to bootstrap the application"""
-        return render_template('bootstrap.html')
+    from flask import Response # pylint: disable=ungrouped-imports
 
     # Forward asset requests to localhost:5001
     # In the development Docker image, webpack-dev-server will be listening
@@ -45,3 +42,14 @@ if nemo.config.DEVELOPMENT:
             asset.content,
             mimetype=asset.headers['Content-Type']
         )
+
+    # Serve bootstrap page on all paths to enable refreshing
+    @INDEX_BP.route('/', methods=['GET'])
+    @INDEX_BP.route('/<path:path>', methods=['GET'])
+    def bootstrap(path=None):
+        """Return a page to bootstrap the application"""
+        LOGGER.info(path)
+        if path and re.match('/assets/.*', path):
+            raise ValueError()
+
+        return render_template('bootstrap.html')

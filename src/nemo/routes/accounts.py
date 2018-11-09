@@ -14,11 +14,11 @@ ACCOUNTS_BP = Blueprint('accounts', __name__)
 def list_accounts():
     """Retreive a listing of accounts"""
     with session_scope() as session:
-        inst_acc = map(map_ia, session.query(InstitutionAccount).all())
-        personal_acc = map(map_pa, session.query(PersonalAccount).all())
+        inst_acc = list(map(map_ia, session.query(InstitutionAccount).all()))
+        personal_acc = list(map(map_pa, session.query(PersonalAccount).all()))
 
     return jsonify({
-        'accounts': list(list(inst_acc) + list(personal_acc))
+        'accounts': inst_acc + personal_acc
     })
 
 @ACCOUNTS_BP.route('/v1/accounts', methods=['POST'])
